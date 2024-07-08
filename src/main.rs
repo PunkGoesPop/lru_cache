@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-#[derive(Debug)]
 struct LRUCache {
     rank: usize,
     capacity: usize,
@@ -36,28 +35,48 @@ impl LRUCache {
         match self.capacity {
             capacity if capacity > self.key_to_value_with_rank.len() => {
                 self.key_to_value_with_rank.insert(key, (self.rank, value));
+                // self.rank_to_value.insert(self.rank, key);
                 self.rank += 1;
             }
             _ => {
-                self.key_to_value_with_rank
-                    .entry(key)
-                    .and_modify(|pair| pair.1 = value);
+                if self.key_to_value_with_rank.contains_key(&key) {
+                    self.key_to_value_with_rank.insert(key, (self.rank, value));
+                    self.rank += 1;
+                } else {
+                    let key_with_min_rank = *self
+                        .key_to_value_with_rank
+                        .iter()
+                        .min_by_key(|k| k.1)
+                        .unwrap()
+                        .0;
+                    self.key_to_value_with_rank.remove(&key_with_min_rank);
+                    self.key_to_value_with_rank.insert(key, (self.rank, value));
+                    self.rank += 1;
+                }
             }
         }
     }
 }
 
 fn main() {
+    // Test case 1 ///
+    // let mut container1 = LRUCache::new(3);
+    // container1.put(12, 101); //rank 0
+    // container1.put(2, 102); // rank 1
+    // container1.put(2, 222); // rank 2
+    // container1.put(1, 777); // rank 3
+    // container1.put(3, 999); //rank 4
+    // container1.put(3, 222);
+    // container1.put(3, 111);
+    // container1.put(3, 12);
+    // container1.put(5, 13);
+    // container1.put(17, 1777);
+
+    // Test case 2 //
     let mut container1 = LRUCache::new(2);
-    container1.put(1, 101);
-    println!("{:?}", container1);
-    container1.put(2, 102);
-    println!("{:?}", container1);
-    container1.get(1);
-    println!("{:?}", container1);
-    //container1.put(3, 133);
-    //container1.put(3, 133);
-    // container1.key_to_value_with_rank.insert(4, (1, 133));
-    // container1.key_to_value_with_rank.insert(5, (1, 133));
-    // container1.key_to_value_with_rank.insert(6, (1, 133));
+    container1.put(12, 101); //rank 0
+    container1.put(2, 102); // rank 1
+    container1.get(2);
+    container1.get(23);
+    container1.put(5, 555);
 }
