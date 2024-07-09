@@ -35,7 +35,6 @@ impl LRUCache {
         match self.capacity {
             capacity if capacity > self.key_to_value_with_rank.len() => {
                 self.key_to_value_with_rank.insert(key, (self.rank, value));
-                // self.rank_to_value.insert(self.rank, key);
                 self.rank += 1;
             }
             _ => {
